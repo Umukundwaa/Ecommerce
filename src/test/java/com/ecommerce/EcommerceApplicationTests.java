@@ -24,17 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Integration tests for secured endpoints.
- *
- * @SpringBootTest  — loads the full application context
- * @AutoConfigureMockMvc — sets up MockMvc without a real server
- * @DirtiesContext — resets DB between tests
- *
- * Key annotations:
- *   @WithMockUser           — simulates a logged-in user with ROLE_USER
- *   @WithMockUser(roles="ADMIN") — simulates an admin user
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -59,10 +48,6 @@ class EcommerceApplicationTests {
                 .build());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 1. PUBLIC ENDPOINTS — no auth required
-    // ═══════════════════════════════════════════════════════════════════════════
-
     @Test
     @DisplayName("GET /api/products — public, returns 200 without login")
     void getProducts_noAuth_returns200() throws Exception {
@@ -86,10 +71,6 @@ class EcommerceApplicationTests {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false));
     }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 2. AUTHENTICATION — register & login
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
     @DisplayName("POST /api/auth/register — creates user and returns JWT")
@@ -186,10 +167,6 @@ class EcommerceApplicationTests {
                 .andExpect(status().isUnauthorized());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 3. PROTECTED ENDPOINTS — requires authentication
-    // ═══════════════════════════════════════════════════════════════════════════
-
     @Test
     @DisplayName("GET /api/auth/me — without token returns 403")
     void getMe_noAuth_returns403() throws Exception {
@@ -203,10 +180,6 @@ class EcommerceApplicationTests {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isForbidden());
     }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 4. ROLE-BASED ACCESS CONTROL
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
     @WithMockUser(roles = "USER")
@@ -280,10 +253,6 @@ class EcommerceApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // 5. SEARCH AND PAGINATION
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
     @DisplayName("GET /api/products/search?keyword=laptop — public search works")
